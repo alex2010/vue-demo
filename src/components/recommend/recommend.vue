@@ -19,7 +19,7 @@
 
       .loading-container(v-show="!discList.length")
         loading
-
+    router-view
 </template>
 
 <script lang="coffeescript">

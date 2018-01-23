@@ -4,7 +4,6 @@
       slot
     .dots
       span.dot(:class='{active: currentPageIndex === index }', v-for='(item, index) in dots')
-
 </template>
 
 <script lang="coffeescript">
@@ -105,13 +104,11 @@
         @timer = setTimeout = ->
           @slider.goToPage pageIndex, 0, 400
           , @interval
-
   }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
-
   .slider
     min-height: 1px
     .slider-group
