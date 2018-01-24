@@ -4,7 +4,7 @@
       li.list-group(v-for="group in data" ref="listGroup")
         h2.list-group-title {{group.title}}
         ul
-          li.list-group-item(v-for="item in group.items")
+          li.list-group-item(v-for="item in group.items" v-on:click="selectItem(item)")
             img.avatar(v-lazy="item.avatar")
             span.name {{item.name}}
     .loading-container(v-show='!data.length')
@@ -42,6 +42,9 @@
       @listHeight = []
 
     methods:
+      selectItem: (item)->
+        @$emit 'select', item
+
       onShortcutTouchStart: (e)->
 
       onShortcutTouchMove: (e)->

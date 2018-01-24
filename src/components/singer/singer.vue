@@ -1,6 +1,7 @@
 <template lang="pug">
   .singer(ref='singer')
-    list-view(v-bind:data="singers")
+    list-view(v-bind:data="singers" v-on:select="selectSinger")
+    router-view
 </template>
 
 <script lang="coffeescript">
@@ -8,6 +9,7 @@
   import {getSingerList} from 'api/singer'
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
+  import {mapMutations} from 'vuex'
 
   HOT_SINGER_LEN = 10
   HOT_NAME = '热门'
@@ -20,7 +22,11 @@
     created: ->
       @_getSingerList()
 
-    methods:
+    methods: Object.assign
+      selectSinger: (singer)->
+        @$router.push
+          path: "/singer/#{singer.id}"
+        @setSinger singer
       _getSingerList: ->
         getSingerList().then (res) =>
           if res.code is ERR_OK
@@ -59,6 +65,7 @@
           a.title.charCodeAt(0) - b.title.charCodeAt(0)
 
         hot.concat ret
+      , mapMutations setSinger: 'SET_SINGER'
 
     components: {ListView}
   }
