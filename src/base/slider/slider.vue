@@ -3,7 +3,7 @@
     .slider-group(ref='sliderGroup')
       slot
     .dots
-      span.dot(:class='{active: currentPageIndex === index }', v-for='(item, index) in dots')
+      span.dot(v-bind:class='{active: currentPageIndex === index }', v-for='(item, index) in dots')
 </template>
 
 <script lang="coffeescript">
@@ -45,9 +45,11 @@
         @slider.refresh()
 
     deactivated: ->
+      @slider.disable()
       clearTimeout @timer
 
     beforeDestroy: ->
+      @slider.disable()
       clearTimeout @timer
 
     activated: ->
@@ -55,6 +57,11 @@
         @_play()
 
     methods:
+      refresh: ->
+        if @slider
+          @_setSliderWidth(true)
+          @slider.refresh()
+
       _setSliderWidth: (isResize)->
         @children = @$refs.sliderGroup.children
         width = 0
@@ -74,19 +81,14 @@
           scrollX: true
           scrollY: false
           momentum: false
-          snap: true
-          snapLoop: this.loop
-          snapThreshold: 0.3
-          snapSpeed: 400
+          snap:
+            loop: @loop
+            threshold: 0.3
+            speed: 400
 
-        @slider.on 'scrollEnd', =>
-          pageIndex = this.slider.getCurrentPage().pageX
+        @slider.on 'scrollEnd', @_onScrollEnd
 
-          if this.loop
-            pageIndex -= 1
-
-          @currentPageIndex = pageIndex
-
+        @slider.on 'touchend', =>
           if @autoPlay
             @_play()
 
@@ -94,16 +96,20 @@
           if @autoPlay
             clearTimeout @timer
 
+      _onScrollEnd: ->
+        pageIndex = @slider.getCurrentPage().pageX
+        @currentPageIndex = pageIndex
+        if @autoPlay
+          @_play()
+
       _initDots: ->
         @dots = new Array(@children.length)
 
       _play: ->
-        pageIndex = @currentPageIndex + 1
-        if @loop
-          pageIndex += 1
-        @timer = setTimeout = ->
-          @slider.goToPage pageIndex, 0, 400
-          , @interval
+        clearTimeout(@timer)
+        @timer = setTimeout =>
+          @slider.next()
+        , @interval
   }
 </script>
 

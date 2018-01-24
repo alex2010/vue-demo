@@ -6,6 +6,9 @@
 <script lang="coffeescript">
   import BScroll from 'better-scroll'
 
+  DIRECTION_H = 'horizontal'
+  DIRECTION_V = 'vertical'
+
   export default {
     props:
       probeType:
@@ -16,9 +19,29 @@
         type: Boolean
         default: true
 
+      listenScroll:
+        type: Boolean
+        default: true
+
       data:
         type: Array
         default: null
+
+      pullup:
+        type: Boolean
+        default: false
+
+      beforeScroll:
+        type: Boolean
+        default: false
+
+      refreshDelay:
+        type: Number
+        default: 20
+
+      direction:
+        type: String
+        default: DIRECTION_V
 
     mounted: ->
       setTimeout =>
@@ -33,6 +56,20 @@
         @scroll = new BScroll @$refs.wrapper,
           probeType: @probeType
           click: @click
+          eventPassthrough: if this.direction is DIRECTION_V then DIRECTION_H else DIRECTION_V
+
+        if @listenScroll
+          @scroll.on 'scroll', (pos)=>
+            @$emit 'scroll', pos
+
+        if @pullup
+          @scroll.on 'scrollEnd', =>
+            if @scroll.y <= @scroll.maxScrollY + 50
+              @$emit 'scrollToEnd', pos
+
+        if @beforeScroll
+          @scroll.on 'beforeScrollStart', =>
+            @$emit 'beforeScroll'
 
       enable: ->
         @scroll && @scroll.enable()
@@ -43,11 +80,17 @@
       refresh: ->
         @scroll && @scroll.refresh()
 
+      scrollTo: ->
+        @scroll && @scroll.scrollTo.apply(@scroll, arguments)
+
+      scrollToElement: ->
+        @scroll && @scroll.scrollToElement.apply(@scroll, arguments)
+
     watch:
       data: ->
         setTimeout =>
           @refresh()
-        , 20
+        , @refreshDelay
   }
 </script>
 
