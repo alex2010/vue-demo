@@ -65,7 +65,7 @@
         if @pullup
           @scroll.on 'scrollEnd', =>
             if @scroll.y <= @scroll.maxScrollY + 50
-              @$emit 'scrollToEnd', pos
+              @$emit 'scrollToEnd'
 
         if @beforeScroll
           @scroll.on 'beforeScrollStart', =>
